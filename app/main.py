@@ -1,5 +1,3 @@
-from http.client import HTTPResponse
-
 from fastapi import FastAPI, APIRouter
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,15 +9,17 @@ from app.schemas import (
     AuthorCreateSchema,
     AuthorDetailSchema,
     AuthorUpdateSchema,
-    AuthorCreateResponseSchema
+    AuthorCreateResponseSchema, BookCreateSchema, BookDetailSchema,
+    BookUpdateSchema
 )
 
 app = FastAPI(
     title="Library management"
 )
-router = APIRouter()
+authors_router = APIRouter(prefix="/authors", tags=["authors"])
+books_router = APIRouter(prefix="/books", tags=["books"])
 
-@router.post("/authors", status_code=status.HTTP_201_CREATED)
+@authors_router.post("", status_code=status.HTTP_201_CREATED)
 async def create_author(
         data: AuthorCreateSchema,
         session: AsyncSession = Depends(get_async_session)
@@ -30,7 +30,7 @@ async def create_author(
     return await crud.create_author(session=session, data=data)
 
 
-@router.get("/authors", response_model=list[AuthorDetailSchema])
+@authors_router.get("", response_model=list[AuthorDetailSchema])
 async def get_all_authors(
         session: AsyncSession = Depends(get_async_session)
 ) -> list[AuthorDetailSchema]:
@@ -40,7 +40,7 @@ async def get_all_authors(
     return await crud.get_all_authors(session=session)
 
 
-@router.get("/authors/{author_id}", response_model=AuthorDetailSchema)
+@authors_router.get("/{author_id}", response_model=AuthorDetailSchema)
 async def get_author_by_id(
         author_id: int,
         session: AsyncSession = Depends(get_async_session)
@@ -51,7 +51,10 @@ async def get_author_by_id(
     return await crud.get_author(session=session, author_id=author_id)
 
 
-@router.post("/authors/{author_id}", response_model=AuthorDetailSchema)
+@authors_router.patch(
+    "/{author_id}",
+    status_code=status.HTTP_200_OK
+)
 async def update_author(
         author_id: int,
         data: AuthorUpdateSchema,
@@ -61,20 +64,84 @@ async def update_author(
         Fully or partially updates author's fields in library
     """
     return await crud.update_author(
-        session=session, author_id=author_id, data=data
+        session=session,
+        author_id=author_id,
+        data=data
     )
 
 
-@router.delete(
-    "/authors/{author_id}",
+@authors_router.delete(
+    "/{author_id}",
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_author(
+async def delete_author_by_id(
         author_id: int,
         session: AsyncSession = Depends(get_async_session)
 ) -> None:
     """
-        Fully or partially updates author's fields in library
+        Deletes author from the library
     """
     await crud.delete_author(session=session, author_id=author_id)
-app.include_router(router)
+
+
+@books_router.post("", status_code=status.HTTP_201_CREATED)
+async def create_book(
+        data: BookCreateSchema,
+        session: AsyncSession = Depends(get_async_session)
+) -> BookDetailSchema:
+    """
+        Creates book in library with incoming data
+    """
+    return await crud.create_book(session=session, data=data)
+
+
+@books_router.get("", response_model=list[BookDetailSchema])
+async def get_all_books(
+        session: AsyncSession = Depends(get_async_session)
+) -> list[BookDetailSchema]:
+    """
+        Returns list of all books in library
+    """
+    return await crud.get_all_books(session=session)
+
+
+@books_router.get("/{book_id}", response_model=BookDetailSchema)
+async def get_book_by_id(
+        book_id: int,
+        session: AsyncSession = Depends(get_async_session)
+) -> BookDetailSchema:
+    """
+        Returns book in library with particular ID
+    """
+    return await crud.get_book(session=session, book_id=book_id)
+
+
+@books_router.patch("/{book_id}", response_model=BookDetailSchema)
+async def update_book(
+        book_id: int,
+        data: BookUpdateSchema,
+        session: AsyncSession = Depends(get_async_session)
+) -> BookDetailSchema:
+    """
+        Fully or partially updates book's fields in library
+    """
+    return await crud.update_book(
+        session=session, book_id=book_id, data=data
+    )
+
+
+@books_router.delete(
+    "/{book_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_book_by_id(
+        book_id: int,
+        session: AsyncSession = Depends(get_async_session)
+) -> None:
+    """
+        Deletes book from library
+    """
+    await crud.delete_book(session=session, book_id=book_id)
+
+app.include_router(authors_router)
+app.include_router(books_router)

@@ -4,13 +4,6 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class AuthorCreateSchema(BaseModel):
-    name: str
-    bio:str
-
-    model_config = {"from_attributes": True}
-
-
 class BookCreateSchema(BaseModel):
     title: str
     summary: str
@@ -20,21 +13,51 @@ class BookCreateSchema(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class BookDetailSchema(BookCreateSchema):
+class BookDetailSchema(BaseModel):
     id: int
-
-
-class AuthorDetailSchema(AuthorCreateSchema):
-    id: int
-    books: Optional[list["BookDetailSchema"]] = None
-
-
-class AuthorUpdateSchema(BaseModel):
-    name: Optional[str]
-    bio: Optional[str]
+    title: str
+    summary: str
+    publication_date: date
+    author_id: int
 
     model_config = {"from_attributes": True}
 
 
-class AuthorCreateResponseSchema(AuthorCreateSchema):
+class BookUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    summary: Optional[str] = None
+    publication_date: Optional[date] = None
+    author_id: Optional[int] = None
+
+    model_config = {"from_attributes": True}
+
+
+class AuthorCreateSchema(BaseModel):
+    name: str
+    bio:str
+
+    model_config = {"from_attributes": True}
+
+
+class AuthorDetailSchema(BaseModel):
     id: int
+    name: str
+    bio: str
+    books: Optional[list["BookDetailSchema"]] = None
+
+    model_config = {"from_attributes": True}
+
+
+class AuthorUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    bio: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class AuthorCreateResponseSchema(BaseModel):
+    id: int
+    name: str
+    bio: str
+
+    model_config = {"from_attributes": True}
