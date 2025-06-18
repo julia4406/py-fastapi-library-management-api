@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class BookCreateSchema(BaseModel):
@@ -34,7 +34,7 @@ class BookUpdateSchema(BaseModel):
 
 class AuthorCreateSchema(BaseModel):
     name: str
-    bio:str
+    bio: str
 
     model_config = {"from_attributes": True}
 

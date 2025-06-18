@@ -3,20 +3,12 @@ from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, \
     AsyncSession
 
-DATABASE_URL="sqlite+aiosqlite:///./lib.db"
+DATABASE_URL = "sqlite+aiosqlite:///./lib.db"
 
 async_engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(
     async_engine, expire_on_commit=False
 )
-
-# # synchron
-# DATABASE_URL="sqlite:///./lib.db"
-#
-# sync_engine = create_engine(
-#     DATABASE_URL, connect_args={"check_same_thread": False}
-# )
-# sync_session_maker = sessionmaker(bind=sync_engine)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

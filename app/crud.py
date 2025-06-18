@@ -1,5 +1,7 @@
+from typing import Optional
+
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -24,16 +26,25 @@ async def create_author(
     return AuthorCreateResponseSchema.model_validate(new_author)
 
 
-async def get_all_authors(session: AsyncSession) -> list[AuthorDetailSchema]:
+async def get_all_authors(
+        session: AsyncSession,
+        skip: int = 0,
+        limit: int = 10
+) -> list[AuthorDetailSchema]:
     result = await session.execute(
-        select(Author).options(selectinload(Author.books))
+        select(Author)
+        .options(selectinload(Author.books))
+        .offset(skip)
+        .limit(limit)
     )
     authors = result.scalars().all()
     return [AuthorDetailSchema.model_validate(author) for author in
             authors]
 
 
-async def get_author(session: AsyncSession, author_id: int) -> AuthorDetailSchema:
+async def get_author(
+        session: AsyncSession, author_id: int
+) -> AuthorDetailSchema:
     result = await session.execute(
         select(Author)
         .options(selectinload(Author.books))
@@ -85,7 +96,6 @@ async def delete_author(
     await session.commit()
 
 
-
 async def create_book(
         session: AsyncSession,
         data: BookCreateSchema
@@ -105,10 +115,18 @@ async def create_book(
 
 
 async def get_all_books(
-        session: AsyncSession
+        session: AsyncSession,
+        author_id: Optional[int] = None,
+        skip: int = 0,
+        limit: int = 10
 ) -> list[BookDetailSchema]:
+    stmt = select(Book)
+
+    if author_id:
+        stmt = select(Book).where(Book.author_id == author_id)
+
     result = await session.execute(
-        select(Book)
+        stmt.offset(skip).limit(limit)
     )
     books = result.scalars().all()
     return [
