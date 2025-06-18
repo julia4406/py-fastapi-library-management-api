@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import (
@@ -32,7 +32,7 @@ class Book(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(nullable=False)
     summary: Mapped[str] = mapped_column()
-    publication_date: Mapped[datetime] = mapped_column(nullable=False)
+    publication_date: Mapped[date] = mapped_column(nullable=False)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
 
     author: Mapped["Author"] = relationship(

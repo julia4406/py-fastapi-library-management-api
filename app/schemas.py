@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -14,7 +14,7 @@ class AuthorCreateSchema(BaseModel):
 class BookCreateSchema(BaseModel):
     title: str
     summary: str
-    publication_date: datetime
+    publication_date: date
     author_id: int
 
     model_config = {"from_attributes": True}
