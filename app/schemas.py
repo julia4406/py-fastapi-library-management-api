@@ -1,15 +1,40 @@
 from datetime import datetime
+from typing import Optional
 
-class AuthorDetailSchema():
-    id: int
+from pydantic import BaseModel, Field
+
+
+class AuthorCreateSchema(BaseModel):
     name: str
     bio:str
-    books: list["BookDetailSchema"]
+
+    model_config = {"from_attributes": True}
 
 
-class BookDetailSchema():
-    id: int
+class BookCreateSchema(BaseModel):
     title: str
     summary: str
     publication_date: datetime
     author_id: int
+
+    model_config = {"from_attributes": True}
+
+
+class BookDetailSchema(BookCreateSchema):
+    id: int
+
+
+class AuthorDetailSchema(AuthorCreateSchema):
+    id: int
+    books: Optional[list["BookDetailSchema"]] = None
+
+
+class AuthorUpdateSchema(BaseModel):
+    name: Optional[str]
+    bio: Optional[str]
+
+    model_config = {"from_attributes": True}
+
+
+class AuthorCreateResponseSchema(AuthorCreateSchema):
+    id: int

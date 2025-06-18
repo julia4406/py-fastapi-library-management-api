@@ -10,6 +10,15 @@ async_session_maker = async_sessionmaker(
     async_engine, expire_on_commit=False
 )
 
+# # synchron
+# DATABASE_URL="sqlite:///./lib.db"
+#
+# sync_engine = create_engine(
+#     DATABASE_URL, connect_args={"check_same_thread": False}
+# )
+# sync_session_maker = sessionmaker(bind=sync_engine)
+
+
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         try:
