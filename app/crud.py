@@ -122,7 +122,7 @@ async def get_all_books(
 ) -> list[BookDetailSchema]:
     stmt = select(Book)
 
-    if author_id:
+    if author_id is not None:
         stmt = select(Book).where(Book.author_id == author_id)
 
     result = await session.execute(
